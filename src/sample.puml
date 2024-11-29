@@ -1,0 +1,70 @@
+@startuml
+!define OrderProcessing
+
+class Order {
+    + Long id
+    + String product
+    + String deliveryType
+    + String paymentType
+    + String address
+    + String postalOffice
+    + boolean isConfirmed
+}
+
+interface DeliveryStrategy {
+    + deliver(String addressOrPostalOffice)
+}
+
+class CourierDeliveryStrategy {
+    + deliver(String address)
+}
+
+class PostDeliveryStrategy {
+    + deliver(String postalOffice)
+}
+
+DeliveryStrategy <|.. CourierDeliveryStrategy
+DeliveryStrategy <|.. PostDeliveryStrategy
+
+interface PaymentStrategy {
+    + pay()
+}
+
+class CardPaymentStrategy {
+    + pay()
+}
+
+class PayPalPaymentStrategy {
+    + pay()
+}
+
+class CashPaymentStrategy {
+    + pay()
+}
+
+PaymentStrategy <|.. CardPaymentStrategy
+PaymentStrategy <|.. PayPalPaymentStrategy
+PaymentStrategy <|.. CashPaymentStrategy
+
+class DeliveryService {
+    - Map<String, DeliveryStrategy> deliveryStrategies
+    + handleDelivery(String type, String addressOrPostalOffice)
+}
+
+class PaymentService {
+    - Map<String, PaymentStrategy> paymentStrategies
+    + handlePayment(String type)
+}
+
+class OrderController {
+    - DeliveryService deliveryService
+    - PaymentService paymentService
+    + processOrder(Order order)
+}
+
+OrderController --> DeliveryService
+OrderController --> PaymentService
+DeliveryService --> DeliveryStrategy
+PaymentService --> PaymentStrategy
+Order --> OrderController
+@enduml
